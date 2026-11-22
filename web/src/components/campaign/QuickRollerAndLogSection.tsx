@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Dices } from 'lucide-react';
 import type { ApiViewPayload, LiveRollEntry } from '../../types';
 import { apiRequest } from '../../lib/api';
@@ -26,7 +26,18 @@ export const QuickRollerAndLogSection: React.FC<QuickRollerAndLogSectionProps> =
 }) => {
   const [logTitle, setLogTitle] = useState('');
   const [logBody, setLogBody] = useState('');
+  const [lastRolledKey, setLastRolledKey] = useState<string | null>(null);
+  const rollTimerRef = useRef<number | null>(null);
   const sheet = view.characterSheet;
+
+  useEffect(
+    () => () => {
+      if (rollTimerRef.current !== null) {
+        window.clearTimeout(rollTimerRef.current);
+      }
+    },
+    [],
+  );
 
   const handleAddLog = async () => {
     if (!logTitle.trim() || !logBody.trim()) return;
@@ -49,6 +60,12 @@ export const QuickRollerAndLogSection: React.FC<QuickRollerAndLogSectionProps> =
   };
 
   const latestRoll = liveRolls[0];
+  const rollTone =
+    latestRoll?.d20 === 20
+      ? ' is-crit'
+      : latestRoll?.d20 === 1
+        ? ' is-fumble'
+        : '';
 
   return (
     <section className="surface-card stack">
@@ -60,8 +77,14 @@ export const QuickRollerAndLogSection: React.FC<QuickRollerAndLogSectionProps> =
       </div>
 
       {/* Vitrina D20 en vivo */}
-      <div className="d20-showcase">
-        <div className="d20-crest" aria-hidden="true">
+      <div
+        key={latestRoll ? latestRoll.id : 'idle'}
+        className={`d20-showcase${rollTone}`}
+      >
+        <div
+          className={`d20-crest${latestRoll ? ` rolling${rollTone}` : ''}`}
+          aria-hidden="true"
+        >
           {latestRoll ? (
             latestRoll.d20
           ) : (
@@ -74,8 +97,16 @@ export const QuickRollerAndLogSection: React.FC<QuickRollerAndLogSectionProps> =
         </div>
         {latestRoll ? (
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 700, color: 'var(--text-strong)', fontSize: '0.9rem' }}>
-              {latestRoll.skillLabel} = {latestRoll.total}
+            <div className="row" style={{ gap: 6 }}>
+              <strong style={{ color: 'var(--text-strong)', fontSize: '0.92rem' }}>
+                {latestRoll.skillLabel} = {latestRoll.total}
+              </strong>
+              {latestRoll.d20 === 20 && (
+                <span className="badge badge-gold">¡Crítico!</span>
+              )}
+              {latestRoll.d20 === 1 && (
+                <span className="badge badge-danger">¡Pifia!</span>
+              )}
             </div>
             <div className="muted" style={{ fontSize: '0.76rem' }}>
               1d20 ({latestRoll.d20}){' '}
@@ -101,8 +132,20 @@ export const QuickRollerAndLogSection: React.FC<QuickRollerAndLogSectionProps> =
             <button
               key={sk.key}
               type="button"
-              className={`quick-skill-btn${sk.proficient ? ' proficient' : ''}`}
-              onClick={() => onRecordRoll(sk.label, total)}
+              className={`quick-skill-btn${sk.proficient ? ' proficient' : ''}${
+                lastRolledKey === sk.key ? ' just-rolled' : ''
+              }`}
+              onClick={() => {
+                onRecordRoll(sk.label, total);
+                setLastRolledKey(sk.key);
+                if (rollTimerRef.current !== null) {
+                  window.clearTimeout(rollTimerRef.current);
+                }
+                rollTimerRef.current = window.setTimeout(
+                  () => setLastRolledKey(null),
+                  650,
+                );
+              }}
             >
               <span className="row" style={{ gap: 6, flexWrap: 'nowrap', minWidth: 0 }}>
                 <span

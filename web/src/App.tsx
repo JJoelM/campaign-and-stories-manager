@@ -426,70 +426,72 @@ export const App: React.FC = () => {
 
       {/* === CONTENIDO PRINCIPAL === */}
       <main className="main-container">
-        {activeTab === 'campaign' && (
-          <CampaignView
-            view={view}
-            isGm={isGm}
-            gmKey={gmKey}
-            liveRolls={liveRolls}
-            onRecordRoll={handleRecordRoll}
-            onRefresh={() => fetchView()}
-            onOpenNode={handleOpenNode}
-            onOpenSession={handleOpenSession}
-            onOpenAtlasGeo={() => setActiveTab('atlas')}
-            onShowToast={showToast}
-            astralOpen={astralOpen}
-            astralMonthIndex={astralMonthIndex}
-            onToggleAstral={(open, monthIdx) => {
-              setAstralOpen(open);
-              if (monthIdx !== undefined) setAstralMonthIndex(monthIdx);
-            }}
-          />
-        )}
+        <div key={activeTab} className="view-stage">
+          {activeTab === 'campaign' && (
+            <CampaignView
+              view={view}
+              isGm={isGm}
+              gmKey={gmKey}
+              liveRolls={liveRolls}
+              onRecordRoll={handleRecordRoll}
+              onRefresh={() => fetchView()}
+              onOpenNode={handleOpenNode}
+              onOpenSession={handleOpenSession}
+              onOpenAtlasGeo={() => setActiveTab('atlas')}
+              onShowToast={showToast}
+              astralOpen={astralOpen}
+              astralMonthIndex={astralMonthIndex}
+              onToggleAstral={(open, monthIdx) => {
+                setAstralOpen(open);
+                if (monthIdx !== undefined) setAstralMonthIndex(monthIdx);
+              }}
+            />
+          )}
 
-        {activeTab === 'atlas' && (
-          <AtlasView
-            view={view}
-            gmOverview={gmOverview}
-            isGm={isGm}
-            gmKey={gmKey}
-            selectedNodeId={selectedNodeId}
-            onRefresh={() => fetchView()}
-            onOpenNode={handleOpenNode}
-            onShowToast={showToast}
-          />
-        )}
+          {activeTab === 'atlas' && (
+            <AtlasView
+              view={view}
+              gmOverview={gmOverview}
+              isGm={isGm}
+              gmKey={gmKey}
+              selectedNodeId={selectedNodeId}
+              onRefresh={() => fetchView()}
+              onOpenNode={handleOpenNode}
+              onShowToast={showToast}
+            />
+          )}
 
-        {activeTab === 'codex' && (
-          <CodexView
-            view={view}
-            isGm={isGm}
-            gmKey={gmKey}
-            selectedNodeId={selectedNodeId}
-            activeSessionChronicle={activeSessionChronicle}
-            onSelectNode={setSelectedNodeId}
-            onSelectSession={setActiveSessionChronicle}
-            onOpenCosmicEvent={handleOpenCosmicEvent}
-            onProposeForNode={handleProposeForNode}
-            onEditInGmStudio={(relPath) => {
-              setGmEditPath(relPath);
-              setDrawer('gm');
-            }}
-            onShowToast={showToast}
-          />
-        )}
+          {activeTab === 'codex' && (
+            <CodexView
+              view={view}
+              isGm={isGm}
+              gmKey={gmKey}
+              selectedNodeId={selectedNodeId}
+              activeSessionChronicle={activeSessionChronicle}
+              onSelectNode={setSelectedNodeId}
+              onSelectSession={setActiveSessionChronicle}
+              onOpenCosmicEvent={handleOpenCosmicEvent}
+              onProposeForNode={handleProposeForNode}
+              onEditInGmStudio={(relPath) => {
+                setGmEditPath(relPath);
+                setDrawer('gm');
+              }}
+              onShowToast={showToast}
+            />
+          )}
 
-        {activeTab === 'sheet' && (
-          <SheetView
-            view={view}
-            gmKey={gmKey}
-            prefill={storyPrefill}
-            onClearPrefill={() => setStoryPrefill(null)}
-            onRecordRoll={handleRecordRoll}
-            onRefresh={() => fetchView()}
-            onShowToast={showToast}
-          />
-        )}
+          {activeTab === 'sheet' && (
+            <SheetView
+              view={view}
+              gmKey={gmKey}
+              prefill={storyPrefill}
+              onClearPrefill={() => setStoryPrefill(null)}
+              onRecordRoll={handleRecordRoll}
+              onRefresh={() => fetchView()}
+              onShowToast={showToast}
+            />
+          )}
+        </div>
       </main>
 
       {/* === BOTTOM NAVIGATION BAR MÓVIL (< 900px) === */}

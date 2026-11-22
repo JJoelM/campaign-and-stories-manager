@@ -63,39 +63,41 @@ export const AtlasView: React.FC<AtlasViewProps> = ({
         </div>
       </div>
 
-      {subMode === 'geo' && (
-        <AtlasGeoMapSubView
-          view={view}
-          gmOverview={gmOverview}
-          visibleMap={visibleMap}
-          isGm={isGm}
-          gmKey={gmKey}
-          onRefresh={onRefresh}
-          onOpenNode={onOpenNode}
-          onShowToast={onShowToast}
-        />
-      )}
+      <div key={subMode} className="view-stage">
+        {subMode === 'geo' && (
+          <AtlasGeoMapSubView
+            view={view}
+            gmOverview={gmOverview}
+            visibleMap={visibleMap}
+            isGm={isGm}
+            gmKey={gmKey}
+            onRefresh={onRefresh}
+            onOpenNode={onOpenNode}
+            onShowToast={onShowToast}
+          />
+        )}
 
-      {subMode === 'relations' && (
-        <AtlasRelationsSubView
-          view={view}
-          visibleMap={visibleMap}
-          isGm={isGm}
-          gmKey={gmKey}
-          onRefresh={onRefresh}
-          onOpenNode={onOpenNode}
-          onShowToast={onShowToast}
-        />
-      )}
+        {subMode === 'relations' && (
+          <AtlasRelationsSubView
+            view={view}
+            visibleMap={visibleMap}
+            isGm={isGm}
+            gmKey={gmKey}
+            onRefresh={onRefresh}
+            onOpenNode={onOpenNode}
+            onShowToast={onShowToast}
+          />
+        )}
 
-      {subMode === 'constellation' && (
-        <AtlasConstellationSubView
-          view={view}
-          visibleMap={visibleMap}
-          selectedNodeId={selectedNodeId}
-          onOpenNode={onOpenNode}
-        />
-      )}
+        {subMode === 'constellation' && (
+          <AtlasConstellationSubView
+            view={view}
+            visibleMap={visibleMap}
+            selectedNodeId={selectedNodeId}
+            onOpenNode={onOpenNode}
+          />
+        )}
+      </div>
     </div>
   );
 };

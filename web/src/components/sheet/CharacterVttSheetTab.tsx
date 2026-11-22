@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Dices, Flame, Heart, Shield, Sparkles } from 'lucide-react';
 import type { ApiViewPayload, ThyreniaCharacterSheet } from '../../types';
 import { apiRequest } from '../../lib/api';
@@ -53,7 +53,26 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
     fields: Partial<ThyreniaCharacterSheet>;
   } | null>(null);
   const [lastRollText, setLastRollText] = useState<string>('');
+  const [justRolledKey, setJustRolledKey] = useState<string | null>(null);
+  const rollTimerRef = useRef<number | null>(null);
   const baseSheet = view.characterSheet;
+
+  useEffect(
+    () => () => {
+      if (rollTimerRef.current !== null) {
+        window.clearTimeout(rollTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  const triggerRollHighlight = (key: string) => {
+    setJustRolledKey(key);
+    if (rollTimerRef.current !== null) {
+      window.clearTimeout(rollTimerRef.current);
+    }
+    rollTimerRef.current = window.setTimeout(() => setJustRolledKey(null), 650);
+  };
   const sheet: ThyreniaCharacterSheet =
     pendingPatch && pendingPatch.characterId === baseSheet.characterId
       ? { ...baseSheet, ...pendingPatch.fields }
@@ -383,11 +402,12 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
               <button
                 key={ab.key}
                 type="button"
-                className="stat-medallion"
+                className={`stat-medallion${justRolledKey === ab.key ? ' just-rolled' : ''}`}
                 title={`Tirar ${ab.full}`}
                 onClick={() => {
                   onRecordRoll(ab.full, mod);
                   setLastRollText(`${ab.full} (${mod >= 0 ? '+' : ''}${mod})`);
+                  triggerRollHighlight(ab.key);
                 }}
               >
                 <span className="stat-medallion-label">{ab.label}</span>
@@ -407,7 +427,11 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
           <h2 className="section-title">
             <Dices size={16} /> Habilidades
           </h2>
-          {lastRollText && <span className="badge badge-gold">{lastRollText}</span>}
+          {lastRollText && (
+            <span key={lastRollText} className="badge badge-gold">
+              {lastRollText}
+            </span>
+          )}
         </div>
 
         <div className="skills-grid">
@@ -421,10 +445,13 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
               <button
                 key={sk.key}
                 type="button"
-                className={`skill-row-btn${sk.proficient ? ' proficient' : ''}`}
+                className={`skill-row-btn${sk.proficient ? ' proficient' : ''}${
+                  justRolledKey === sk.key ? ' just-rolled' : ''
+                }`}
                 onClick={() => {
                   onRecordRoll(sk.label, mod);
                   setLastRollText(`${sk.label} (${mod >= 0 ? '+' : ''}${mod})`);
+                  triggerRollHighlight(sk.key);
                 }}
               >
                 <span

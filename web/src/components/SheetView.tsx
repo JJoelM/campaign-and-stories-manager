@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Download, MoreHorizontal, PenLine, Shield } from 'lucide-react';
 import type { ApiViewPayload } from '../types';
 import { downloadAuthenticatedFile } from '../lib/api';
+import { usePopoverDismiss } from '../lib/usePopoverDismiss';
 import { CharacterVttSheetTab } from './sheet/CharacterVttSheetTab';
 import {
   PlayerNotesComposerTab,
@@ -32,6 +33,8 @@ export const SheetView: React.FC<SheetViewProps> = ({
   const sheet = view.characterSheet;
   const [subTab, setSubTab] = useState<'sheet' | 'notes'>('sheet');
   const [menuOpen, setMenuOpen] = useState(false);
+
+  usePopoverDismiss(menuOpen, () => setMenuOpen(false));
 
   useEffect(() => {
     if (prefill) {
@@ -100,24 +103,26 @@ export const SheetView: React.FC<SheetViewProps> = ({
         </div>
       </div>
 
-      {subTab === 'sheet' ? (
-        <CharacterVttSheetTab
-          view={view}
-          gmKey={gmKey}
-          onRecordRoll={onRecordRoll}
-          onRefresh={onRefresh}
-          onShowToast={onShowToast}
-        />
-      ) : (
-        <PlayerNotesComposerTab
-          view={view}
-          gmKey={gmKey}
-          prefill={prefill}
-          onClearPrefill={onClearPrefill}
-          onRefresh={onRefresh}
-          onShowToast={onShowToast}
-        />
-      )}
+      <div key={subTab} className="view-stage">
+        {subTab === 'sheet' ? (
+          <CharacterVttSheetTab
+            view={view}
+            gmKey={gmKey}
+            onRecordRoll={onRecordRoll}
+            onRefresh={onRefresh}
+            onShowToast={onShowToast}
+          />
+        ) : (
+          <PlayerNotesComposerTab
+            view={view}
+            gmKey={gmKey}
+            prefill={prefill}
+            onClearPrefill={onClearPrefill}
+            onRefresh={onRefresh}
+            onShowToast={onShowToast}
+          />
+        )}
+      </div>
     </div>
   );
 };

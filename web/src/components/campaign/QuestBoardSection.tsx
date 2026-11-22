@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import type { ApiViewPayload, CampaignQuest, LoreNode } from '../../types';
 import { apiRequest, downloadAuthenticatedFile } from '../../lib/api';
+import { usePopoverDismiss } from '../../lib/usePopoverDismiss';
 
 interface QuestBoardSectionProps {
   view: ApiViewPayload;
@@ -34,6 +35,9 @@ export const QuestBoardSection: React.FC<QuestBoardSectionProps> = ({
   const [showRumorForm, setShowRumorForm] = useState(false);
   const [showNewQuestForm, setShowNewQuestForm] = useState(false);
   const [openQuestMenuId, setOpenQuestMenuId] = useState<string | null>(null);
+  const [pendingObjectives, setPendingObjectives] = useState<Record<string, boolean>>({});
+
+  usePopoverDismiss(openQuestMenuId !== null, () => setOpenQuestMenuId(null));
 
   const [rumorTitle, setRumorTitle] = useState('');
   const [rumorLoc, setRumorLoc] = useState('');
@@ -339,41 +343,61 @@ export const QuestBoardSection: React.FC<QuestBoardSectionProps> = ({
 
             {q.objectives.length > 0 && (
               <div className="stack" style={{ gap: 4 }}>
-                {q.objectives.map((obj, idx) => (
-                  <label
-                    key={idx}
-                    className="row"
-                    style={{
-                      fontSize: '0.84rem',
-                      textDecoration: obj.done ? 'line-through' : 'none',
-                      color: obj.done ? 'var(--muted)' : 'var(--text)',
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={obj.done}
-                      disabled={!isGm}
-                      onChange={async () => {
-                        await apiRequest(
-                          '/api/gm/quests/save',
-                          {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              campaignId: view.activeCampaign.id,
-                              id: q.id,
-                              action: 'toggle_objective',
-                              objectiveIdx: idx,
-                            }),
-                          },
-                          gmKey,
-                        );
-                        await onRefresh();
+                {q.objectives.map((obj, idx) => {
+                  const objKey = `${q.id}:${idx}`;
+                  const isDone =
+                    objKey in pendingObjectives
+                      ? pendingObjectives[objKey]
+                      : obj.done;
+                  return (
+                    <label
+                      key={idx}
+                      className="row"
+                      style={{
+                        fontSize: '0.84rem',
+                        textDecoration: isDone ? 'line-through' : 'none',
+                        color: isDone ? 'var(--muted)' : 'var(--text)',
                       }}
-                    />
-                    <span>{obj.text}</span>
-                  </label>
-                ))}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isDone}
+                        disabled={!isGm}
+                        onChange={async () => {
+                          const nextVal = !isDone;
+                          setPendingObjectives((p) => ({
+                            ...p,
+                            [objKey]: nextVal,
+                          }));
+                          try {
+                            await apiRequest(
+                              '/api/gm/quests/save',
+                              {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  campaignId: view.activeCampaign.id,
+                                  id: q.id,
+                                  action: 'toggle_objective',
+                                  objectiveIdx: idx,
+                                }),
+                              },
+                              gmKey,
+                            );
+                            await onRefresh();
+                          } finally {
+                            setPendingObjectives((p) => {
+                              const copy = { ...p };
+                              delete copy[objKey];
+                              return copy;
+                            });
+                          }
+                        }}
+                      />
+                      <span>{obj.text}</span>
+                    </label>
+                  );
+                })}
               </div>
             )}
 

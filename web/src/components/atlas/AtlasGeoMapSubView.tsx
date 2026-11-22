@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -74,6 +74,15 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
 }) => {
   const [currentMapId, setCurrentMapId] = useState<string>('world-thyrenia');
   const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const dragStartRef = useRef<{
+    x: number;
+    y: number;
+    origX: number;
+    origY: number;
+  } | null>(null);
+  const didDragRef = useRef(false);
   const [selectedPin, setSelectedPin] = useState<CampaignMapPin | 'party' | null>(null);
   const [gmClickMode, setGmClickMode] = useState<'none' | 'pin' | 'party'>('none');
   const [pinDraft, setPinDraft] = useState<{
@@ -134,6 +143,31 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
     return currentMap.pins || [];
   }, [currentMap, isGm, gmOverview]);
 
+  const clampPan = (x: number, y: number, scale: number) => {
+    const limit = Math.max(0, (scale - 1) * 260);
+    return {
+      x: Math.max(-limit, Math.min(limit, x)),
+      y: Math.max(-limit, Math.min(limit, y)),
+    };
+  };
+
+  const changeZoom = (delta: number) => {
+    setZoom((z) => {
+      const next = Math.max(1, Math.min(2.25, Number((z + delta).toFixed(2))));
+      if (next <= 1) {
+        setPan({ x: 0, y: 0 });
+      } else {
+        setPan((p) => clampPan(p.x, p.y, next));
+      }
+      return next;
+    });
+  };
+
+  const resetZoom = () => {
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
+
   const navigateToMap = (targetMapId: string) => {
     const target = atlasMapById.get(targetMapId);
     if (!target) return;
@@ -147,6 +181,7 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
     setCurrentMapId(target.id);
     setSelectedPin(null);
     setZoom(1);
+    setPan({ x: 0, y: 0 });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -162,6 +197,10 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
   }, [pins, view.partyPosition]);
 
   const handleMapClick = async (evt: React.MouseEvent<HTMLElement>) => {
+    if (didDragRef.current) {
+      didDragRef.current = false;
+      return;
+    }
     if (!isGm || gmClickMode === 'none') return;
     const rect = evt.currentTarget.getBoundingClientRect();
     const x = Number((((evt.clientX - rect.left) / rect.width) * 100).toFixed(1));
@@ -268,22 +307,26 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
             type="button"
             className="btn-icon"
             aria-label="Alejar mapa"
-            onClick={() =>
-              setZoom((z) => Math.max(1, Number((z - 0.25).toFixed(2))))
-            }
+            disabled={zoom <= 1}
+            onClick={() => changeZoom(-0.25)}
           >
             <ZoomOut size={15} />
           </button>
-          <span className="muted" style={{ fontSize: '0.78rem', minWidth: 38, textAlign: 'center' }}>
+          <button
+            type="button"
+            className="btn-ghost"
+            style={{ fontSize: '0.78rem', minWidth: 48, padding: '4px 6px' }}
+            title="Restablecer zoom (100%)"
+            onClick={resetZoom}
+          >
             {Math.round(zoom * 100)}%
-          </span>
+          </button>
           <button
             type="button"
             className="btn-icon"
             aria-label="Acercar mapa"
-            onClick={() =>
-              setZoom((z) => Math.min(2.25, Number((z + 0.25).toFixed(2))))
-            }
+            disabled={zoom >= 2.25}
+            onClick={() => changeZoom(0.25)}
           >
             <ZoomIn size={15} />
           </button>
@@ -363,7 +406,48 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
       )}
 
       {/* Marco del mapa con cartela cartográfica e inspector anclado */}
-      <div className="map-frame">
+      <div
+        className={`map-frame${zoom > 1 && gmClickMode === 'none' ? ' can-pan' : ''}${
+          isPanning ? ' is-panning' : ''
+        }`}
+        onMouseDown={(e) => {
+          if (zoom <= 1 || gmClickMode !== 'none' || e.button !== 0) return;
+          const target = e.target as Element | null;
+          if (target?.closest('button, .atlas-pin-overlay')) return;
+          e.preventDefault();
+          didDragRef.current = false;
+          setIsPanning(true);
+          dragStartRef.current = {
+            x: e.clientX,
+            y: e.clientY,
+            origX: pan.x,
+            origY: pan.y,
+          };
+        }}
+        onMouseMove={(e) => {
+          if (!isPanning || !dragStartRef.current) return;
+          const dx = e.clientX - dragStartRef.current.x;
+          const dy = e.clientY - dragStartRef.current.y;
+          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+            didDragRef.current = true;
+          }
+          setPan(
+            clampPan(
+              dragStartRef.current.origX + dx,
+              dragStartRef.current.origY + dy,
+              zoom,
+            ),
+          );
+        }}
+        onMouseUp={() => {
+          setIsPanning(false);
+          dragStartRef.current = null;
+        }}
+        onMouseLeave={() => {
+          setIsPanning(false);
+          dragStartRef.current = null;
+        }}
+      >
         <div className="map-cartouche">
           <div className="map-cartouche-title">{currentMap.name}</div>
           <div className="map-cartouche-sub">
@@ -375,15 +459,19 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
           </div>
         </div>
         <div
-          className="map-canvas-inner"
-          style={{ transform: `scale(${zoom})` }}
+          className={`map-canvas-inner${isPanning ? ' is-panning' : ''}`}
+          style={{
+            transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+          }}
         >
+          <div key={currentMap.id} className="map-level-stage">
           {currentMap.imageFile ? (
             <img
               src={`/api/vault/media?file=${encodeURIComponent(currentMap.imageFile)}`}
               alt={currentMap.name}
+              draggable={false}
               style={{
-                cursor: isGm && gmClickMode !== 'none' ? 'crosshair' : 'default',
+                cursor: isGm && gmClickMode !== 'none' ? 'crosshair' : 'inherit',
               }}
               onClick={handleMapClick}
             />
@@ -391,7 +479,7 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
             <div
               className={`cartographic-svg-stage scale-${currentMap.scale}`}
               style={{
-                cursor: isGm && gmClickMode !== 'none' ? 'crosshair' : 'default',
+                cursor: isGm && gmClickMode !== 'none' ? 'crosshair' : 'inherit',
               }}
               onClick={handleMapClick}
             >
@@ -573,10 +661,23 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
                 }}
               >
                 {renderPinGlyph(pin)}
-                <span className="map-pin-tooltip">
-                  {pin.label}
-                  {hasLockedChild ? ' (Velado)' : ''}
-                </span>
+                {(currentMap.scale === 'world' ||
+                  hasLockedChild ||
+                  hasUnlockedChild) && (
+                  <span className="map-pin-tooltip">
+                    {currentMap.scale === 'world'
+                      ? `${pin.label}${
+                          hasLockedChild
+                            ? ' (Velado)'
+                            : hasUnlockedChild
+                              ? ' · Doble clic para entrar'
+                              : ''
+                        }`
+                      : hasLockedChild
+                        ? 'Mapa detallado velado'
+                        : 'Doble clic para entrar al plano'}
+                  </span>
+                )}
                 {currentMap.scale !== 'world' && (
                   <span className="map-pin-label">{pin.label}</span>
                 )}
@@ -601,6 +702,7 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
               </span>
             </button>
           )}
+          </div>
         </div>
 
         {/* Tarjeta superpuesta dentro del propio marco del mapa (0 scroll extra en desktop) */}
@@ -608,7 +710,7 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
           <div className="atlas-pin-overlay anchored stack" style={{ gap: 8 }}>
             {selectedPin === 'party' ? (
               <>
-                <div className="row-between">
+                <div className="row-between pin-header-row">
                   <div className="row">
                     <span className="badge badge-prog">Posición del Grupo</span>
                     <strong style={{ fontFamily: 'var(--display-font)' }}>
@@ -642,7 +744,7 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
               </>
             ) : (
               <>
-                <div className="row-between">
+                <div className="row-between pin-header-row">
                   <div className="row">
                     <span
                       className={`badge ${

@@ -26,6 +26,8 @@ export const PlotTimelineSection: React.FC<PlotTimelineSectionProps> = ({
   const [selectedIdx, setSelectedIdx] = useState<number>(defaultIdx);
   const [astralSeason, setAstralSeason] = useState<string>('all');
   const stripRef = useRef<HTMLDivElement>(null);
+  const chipRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const didInitStripRef = useRef(false);
   const astralRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,6 +37,19 @@ export const PlotTimelineSection: React.FC<PlotTimelineSectionProps> = ({
       }, 60);
     }
   }, [astralOpen]);
+
+  useEffect(() => {
+    const strip = stripRef.current;
+    const chip = chipRefs.current[selectedIdx];
+    if (!strip || !chip) return;
+    const targetLeft =
+      chip.offsetLeft - strip.clientWidth / 2 + chip.clientWidth / 2;
+    strip.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: didInitStripRef.current ? 'smooth' : 'auto',
+    });
+    didInitStripRef.current = true;
+  }, [selectedIdx]);
 
   const activeEntry =
     tl.entries[Math.min(selectedIdx, Math.max(0, tl.entries.length - 1))] ||
@@ -46,9 +61,9 @@ export const PlotTimelineSection: React.FC<PlotTimelineSectionProps> = ({
     ) || tl.cosmicWheel[0];
 
   const scrollStrip = (dir: number) => {
-    const next = Math.max(0, Math.min(tl.entries.length - 1, selectedIdx + dir));
-    setSelectedIdx(next);
-    stripRef.current?.scrollBy({ left: dir * 195, behavior: 'smooth' });
+    setSelectedIdx((prev) =>
+      Math.max(0, Math.min(tl.entries.length - 1, prev + dir)),
+    );
   };
 
   return (
@@ -85,11 +100,31 @@ export const PlotTimelineSection: React.FC<PlotTimelineSectionProps> = ({
       </div>
 
       <div className="timeline-track-wrap">
-        <div className="timeline-strip" ref={stripRef}>
+        <div
+          className="timeline-strip"
+          ref={stripRef}
+          tabIndex={0}
+          role="listbox"
+          aria-label="Hitos de campaña"
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowLeft') {
+              e.preventDefault();
+              scrollStrip(-1);
+            } else if (e.key === 'ArrowRight') {
+              e.preventDefault();
+              scrollStrip(1);
+            }
+          }}
+        >
           {tl.entries.map((entry, idx) => (
             <button
               key={entry.id}
+              ref={(el) => {
+                chipRefs.current[idx] = el;
+              }}
               type="button"
+              role="option"
+              aria-selected={idx === selectedIdx}
               className={`timeline-chip${idx === selectedIdx ? ' active' : ''}`}
               onClick={() => {
                 if (idx === selectedIdx && entry.kind !== 'upcoming') {
@@ -120,7 +155,7 @@ export const PlotTimelineSection: React.FC<PlotTimelineSectionProps> = ({
       </div>
 
       {activeEntry && (
-        <div className="timeline-focus">
+        <div key={activeEntry.id} className="timeline-focus">
           <div className="row-between">
             <div className="row">
               <span className="badge badge-gold">{activeEntry.sessionTag}</span>

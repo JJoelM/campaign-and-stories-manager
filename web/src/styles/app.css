@@ -107,7 +107,16 @@ button {
   box-shadow:
     inset 0 1px 0 rgba(255, 245, 220, 0.12),
     inset 0 -1px 0 rgba(0, 0, 0, 0.3);
-  transition: border-color 0.14s ease, background 0.14s ease, color 0.14s ease;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.12s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.15s ease;
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
 }
 
 button:not(.btn-primary):not(.active):hover:not(:disabled) {
@@ -748,6 +757,7 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  animation: grimoirePageUnfold 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .timeline-focus-grid {
@@ -774,6 +784,18 @@ textarea {
   justify-content: space-between;
   gap: 14px;
   background: var(--bg-card);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.d20-showcase.is-crit {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 24px var(--accent-soft);
+}
+
+.d20-showcase.is-fumble {
+  border-color: var(--danger);
+  border-left-color: var(--danger);
+  box-shadow: inset 0 0 24px rgba(224, 82, 71, 0.14);
 }
 
 .d20-crest {
@@ -790,6 +812,20 @@ textarea {
   font-size: 1.15rem;
   font-weight: 700;
   flex-shrink: 0;
+}
+
+.d20-crest.rolling {
+  animation: d20Tumble 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.d20-crest.is-crit {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.d20-crest.is-fumble {
+  border-color: var(--danger);
+  color: var(--danger);
 }
 
 .quick-skill-grid {
@@ -821,6 +857,15 @@ textarea {
 .quick-skill-btn:hover:not(:disabled) {
   border-color: var(--accent);
   background: var(--bg-subtle);
+}
+
+.quick-skill-btn.just-rolled,
+.skill-row-btn.just-rolled,
+.stat-medallion.just-rolled {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 4px 14px var(--accent-soft);
 }
 
 .cosmic-box {
@@ -869,17 +914,20 @@ textarea {
   border-left-style: dashed;
 }
 
-.quest-header-row {
+.quest-header-row,
+.pin-header-row {
   align-items: flex-start;
   flex-wrap: nowrap;
 }
 
-.quest-header-row > .row {
+.quest-header-row > .row,
+.pin-header-row > .row {
   flex: 1;
   min-width: 0;
 }
 
-.quest-header-row > .menu-wrap {
+.quest-header-row > .menu-wrap,
+.pin-header-row > button {
   flex-shrink: 0;
 }
 
@@ -892,6 +940,10 @@ textarea {
   border-radius: 5px;
   background: var(--bg-subtle);
   border: 1px solid var(--border);
+}
+
+.roll-feed-item:first-child {
+  animation: rollFeedSlideIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* === Atlas & Cartografía === */
@@ -912,11 +964,29 @@ textarea {
   background: var(--bg-subtle);
 }
 
+.map-frame.can-pan {
+  cursor: grab;
+}
+
+.map-frame.is-panning {
+  cursor: grabbing;
+}
+
 .map-canvas-inner {
   position: relative;
   width: 100%;
   transform-origin: center center;
-  transition: transform 0.2s ease;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.map-canvas-inner.is-panning {
+  transition: none;
+}
+
+.map-level-stage {
+  position: relative;
+  width: 100%;
+  animation: mapLevelReveal 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .map-canvas-inner img {
@@ -937,7 +1007,15 @@ textarea {
   background: rgba(16, 13, 10, 0.94);
   color: #f4eee4;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+  transition:
+    transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
   z-index: 4;
+}
+
+button.map-icon-pin:active:not(:disabled) {
+  transform: translate(-50%, -50%) scale(0.95);
 }
 
 .map-icon-pin.has-submap {
@@ -951,6 +1029,22 @@ textarea {
   transform: translate(-50%, -50%) scale(1.12);
   border-color: #ffffff;
   z-index: 9;
+}
+
+.map-icon-pin.party::after,
+.map-icon-pin.selected::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 1.5px solid var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  animation: pinBeaconPulse 2.2s ease-out infinite;
+}
+
+.map-icon-pin.party::after {
+  border-color: var(--prog);
 }
 
 .map-icon-pin.rumor {
@@ -1023,6 +1117,7 @@ textarea {
   border-radius: 6px;
   padding: 16px 18px;
   box-shadow: var(--shadow-float);
+  animation: pinOverlayReveal 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @media (min-width: 720px) {
@@ -1132,6 +1227,7 @@ textarea {
   padding: 24px 22px;
   max-width: 780px;
   margin: 0 auto;
+  animation: grimoirePageUnfold 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @media (min-width: 780px) {
@@ -1327,6 +1423,7 @@ textarea {
   background: rgba(8, 6, 4, 0.74);
   display: flex;
   justify-content: flex-end;
+  animation: backdropFadeIn 0.16s ease both;
 }
 
 .drawer-sheet {
@@ -1340,6 +1437,7 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  animation: drawerSlideIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .menu-wrap {
@@ -1360,6 +1458,8 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  transform-origin: top right;
+  animation: popoverUnfold 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .menu-item {
@@ -1392,6 +1492,7 @@ textarea {
   box-shadow: var(--shadow-float);
   max-width: min(480px, calc(100vw - 24px));
   font-size: 0.84rem;
+  animation: toastRiseIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @media (min-width: 780px) {
@@ -1692,7 +1793,7 @@ textarea {
 
 .vital-bar-fill {
   height: 100%;
-  transition: width 0.2s ease;
+  transition: width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .vital-bar-fill.hp {
@@ -1736,11 +1837,22 @@ textarea {
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  transition:
+    transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .stat-medallion:hover {
   border-color: var(--accent);
   background: var(--bg-subtle);
+  transform: translateY(-2px);
+}
+
+.stat-medallion:hover .stat-medallion-score {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .stat-medallion-label {
@@ -1773,6 +1885,7 @@ textarea {
   font-weight: 700;
   color: var(--text-strong);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.16s ease, color 0.16s ease;
 }
 
 .passive-ribbon {
@@ -1818,6 +1931,10 @@ textarea {
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1;
+}
+
+.seal-pip-btn.active {
+  animation: runeIgnite 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .seal-pip-btn.active,
@@ -2078,4 +2195,157 @@ textarea {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* === Motion Choreography & Micro-Animations === */
+.view-stage {
+  animation: grimoirePageUnfold 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.view-stage > .stack-lg > *:nth-child(1) {
+  animation: grimoirePageUnfold 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.view-stage > .stack-lg > *:nth-child(2) {
+  animation: grimoirePageUnfold 0.22s cubic-bezier(0.22, 1, 0.36, 1) 0.04s both;
+}
+
+.view-stage > .stack-lg > *:nth-child(3) {
+  animation: grimoirePageUnfold 0.22s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+}
+
+.view-stage > .stack-lg > *:nth-child(4) {
+  animation: grimoirePageUnfold 0.22s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+@keyframes grimoirePageUnfold {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes drawerSlideIn {
+  from {
+    opacity: 0.6;
+    transform: translateX(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes popoverUnfold {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes toastRiseIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes d20Tumble {
+  0% {
+    transform: rotate(-18deg) scale(0.84);
+  }
+  55% {
+    transform: rotate(8deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes rollFeedSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes runeIgnite {
+  0% {
+    transform: scale(0.82);
+  }
+  55% {
+    transform: scale(1.26);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes mapLevelReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pinBeaconPulse {
+  0% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.55);
+  }
+}
+
+@keyframes pinOverlayReveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import type { ApiViewPayload, LoreNode, PlotTimelineEntry } from '../types';
 import { downloadAuthenticatedFile } from '../lib/api';
+import { usePopoverDismiss } from '../lib/usePopoverDismiss';
 import {
   CARD_TYPE_LABELS,
   classifyCategory,
@@ -61,6 +62,8 @@ export const CodexView: React.FC<CodexViewProps> = ({
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [filterText, setFilterText] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+
+  usePopoverDismiss(menuOpen, () => setMenuOpen(false));
 
   const visibleMap = useMemo(
     () => new Map(view.visibleNodes.map((n) => [n.id.toLowerCase(), n])),
@@ -141,7 +144,10 @@ export const CodexView: React.FC<CodexViewProps> = ({
       `### Resumen\n\n${activeSessionChronicle.summary}\n\n### Hitos\n${activeSessionChronicle.highlights.map((h) => `- ${h}`).join('\n')}`;
     const html = renderMarkdownHtml(md, visibleMap, view, activeSessionChronicle.title);
     return (
-      <article className="reader-article chapter-mode stack">
+      <article
+        key={activeSessionChronicle.id}
+        className="reader-article chapter-mode stack"
+      >
         <div className="row-between">
           <button
             type="button"
@@ -227,7 +233,10 @@ export const CodexView: React.FC<CodexViewProps> = ({
     );
 
     return (
-      <article className={`reader-article${isChapter ? ' chapter-mode' : ''} stack`}>
+      <article
+        key={selectedNode.id}
+        className={`reader-article${isChapter ? ' chapter-mode' : ''} stack`}
+      >
         <div className="row-between">
           <button
             type="button"
@@ -391,7 +400,7 @@ export const CodexView: React.FC<CodexViewProps> = ({
 
   // === MODO EXPLORADOR POR TOMO ===
   return (
-    <div className="stack-lg">
+    <div className="stack-lg view-stage">
       <section className="panel stack">
         <div className="row-between section-header-rule">
           <div>
