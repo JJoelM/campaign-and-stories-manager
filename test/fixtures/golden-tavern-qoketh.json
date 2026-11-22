@@ -1,0 +1,49 @@
+{
+  "fixtureKey": "golden-tavern-qoketh",
+  "metadata": {
+    "modelId": "gemini-3.8-flash",
+    "scenario": "Encuentro en la posada junto a una Vena de Maná"
+  },
+  "output": {
+    "narration": "El posadero sirve una humeante taza de qoketh oscuro a cambio de una moneda de plata. Al acercarte al constructo en el rincón, sientes cómo el Maná pulsa a través de las runas grabadas en su chasis de bronce: no es un simple autómata de carga, sino un gólem centinela de hace más de tres septimanas que aún conserva ecos del Cosmos.",
+    "mechanicalResolution": {
+      "triggeredCheck": true,
+      "skillOrAttribute": "Arcana",
+      "difficultyClass": 15,
+      "rollResult": 17,
+      "outcome": "success"
+    },
+    "stateMutations": {
+      "newlyRevealedNodeIds": [
+        "Flujos de Maná (Venas de Maná)"
+      ],
+      "updatedEnvironmentFlags": {
+        "golem_runas_analizadas": true
+      },
+      "factionReputationDeltas": {
+        "Luz de Medialuna": 1
+      }
+    },
+    "branchingChoices": [
+      {
+        "id": "choice-canalizar-mana",
+        "label": "Canalizar un hilo de Maná hacia el núcleo del gólem para leer su memoria",
+        "intentType": "arcane"
+      },
+      {
+        "id": "choice-interrogar-posadero",
+        "label": "Preguntar al posadero quién abandonó el constructo en la posada",
+        "intentType": "social"
+      }
+    ],
+    "proposedCanonUpdates": [
+      {
+        "title": "Gólem Centinela de la Posada del Bronce",
+        "category": "new_npc",
+        "summary": "Constructo antiguo hallado por Olivia Zyltris con runas vinculadas a una Vena de Maná.",
+        "targetSubfolder": "01 - Campanas/01 - Campana Principal (Luz de Medialuna)",
+        "markdownContent": "# Gólem Centinela de la Posada del Bronce\n\nUn antiguo constructo resonante con [[Maná]] descubierto durante una pausa con qoketh."
+      }
+    ]
+  }
+}

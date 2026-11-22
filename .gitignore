@@ -1,0 +1,44 @@
+# Dependencias y compilación
+node_modules/
+dist/
+.next/
+out/
+
+# Secretos y variables de entorno (NUNCA versionar)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+!.env.example
+
+# Bases de datos locales y estado de sesión
+*.sqlite
+*.sqlite3
+*.db
+.runtime/
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cachés de compilación y tests
+coverage/
+.vite/
+*.tsbuildinfo
+*.log
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Certificados o llaves locales
+*.pem
+*.key

@@ -1,0 +1,8 @@
+# Arquitectura de Ciberseguridad, Protección de API Keys y Aislamiento Zero-Trust
+
+Decidimos implementar cuatro capas de seguridad obligatorias en el motor y el Harness de Gemini:
+
+1. **Protección de Credenciales (`GEMINI_API_KEY`)**: Las claves de API operan exclusivamente en el entorno de servidor local, se transmiten únicamente mediante cabeceras HTTP (`x-goog-api-key`, prohibiendo query strings `?key=`), se excluyen estrictamente de control de versiones y pasan por un redactor automático (`SecretRedactor`) que enmascara patrones `AIza...` antes de persistir logs o fixtures de pruebas.
+2. **Aislamiento Zero-Trust contra Prompt Injection**: El filtrado de secretos del DM (`%%...%%`, `#secreto`) y de la **Niebla de Guerra Estratificada** ocurre determinísticamente en código antes de construir el prompt; el LLM jamás recibe en su contexto nodos no autorizados para el jugador activo, haciendo físicamente imposible su exfiltración mediante *jailbreaks*. Las acciones de los jugadores se sanitizan y encapsulan en delimitadores `<untrusted_player_action>`.
+3. **Prevención de Path Traversal en el Vault (`SafeVaultPathGuard`)**: Toda escritura en el **Vault Maestro** originada tras la aprobación de una **Propuesta de Canon** valida canónicamente la ruta destino con `path.resolve`, bloqueando secuencias `..`, rutas fuera del vault y directorios de sistema/configuración (`.obsidian`, `.agents`, `.git`, `.scratch`).
+4. **Control de Cuota y Rate Limiting**: El driver aplica límites de longitud de entrada, presupuestos máximos de tokens de salida y limitación de frecuencia de llamadas para prevenir agotamiento de cuota o denegación de servicio.
