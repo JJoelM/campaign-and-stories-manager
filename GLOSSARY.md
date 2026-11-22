@@ -53,5 +53,13 @@ _Avoid_: Borrador, sugerencia de texto
 Registro canónico de eventos, elecciones y consecuencias ocurridas durante una sesión o interacción, persistido de vuelta en el vault maestro.
 _Avoid_: Log, historial de chat
 
+**Atlas Multi-Nivel**:
+Representación cartográfica jerárquica del mundo (Planisferio → Continente → Ciudad) cuyos niveles y enclaves se revelan dinámicamente según la Niebla de Guerra Estratificada.
+_Avoid_: Mapa plano, imagen estática
+
+**Rueda Astral**:
+Calendario cosmológico de Thyrenia compuesto por meses divinos, estaciones y festividades que rigen el cómputo temporal de las campañas.
+_Avoid_: Calendario gregoriano, reloj de sistema
+
 
 

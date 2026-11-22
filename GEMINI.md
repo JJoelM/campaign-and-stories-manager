@@ -1,6 +1,6 @@
 # GEMINI.md — Directrices Especializadas para Modelos Gemini en Thyrenia Engine
 
-Lee y respeta todas las directrices definidas en `AGENTS.md`, `GLOSSARY.md` y `docs/adr/0001` a `0011` en la raíz de este repositorio.
+Lee y respeta todas las directrices definidas en `AGENTS.md`, `MEMORY.md`, `GLOSSARY.md` y `docs/adr/0001` a `0012` en la raíz de este repositorio.
 
 ## Modelos Vigentes de Google AI Studio
 - No utilices identificadores deprecados de la serie 2.5 (`gemini-2.5-pro`).

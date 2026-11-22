@@ -5,7 +5,8 @@ How the engineering skills should consume this repo's domain documentation when 
 ## Before exploring, read these
 
 - **`GLOSSARY.md`** at the repo root (`C:\Users\joelm\source\repos\thyrenia-engine\GLOSSARY.md`).
-- **`docs/adr/`**: read all ADRs (`0001` through `0011`) at `C:\Users\joelm\source\repos\thyrenia-engine\docs\adr\`.
+- **`MEMORY.md`** at the repo root (`C:\Users\joelm\source\repos\thyrenia-engine\MEMORY.md`) for architectural state and UI/security invariants.
+- **`docs/adr/`**: read all ADRs (`0001` through `0012`) at `C:\Users\joelm\source\repos\thyrenia-engine\docs\adr\`.
 
 ## Use the glossary's vocabulary
 

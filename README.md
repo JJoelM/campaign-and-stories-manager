@@ -52,6 +52,8 @@
 
 ## Documentación
 
+- [AGENTS.md](./AGENTS.md): reglas de ciberseguridad, UI/UX y desarrollo.
+- [MEMORY.md](./MEMORY.md): arquitectura actual, flujos y lecciones técnicas.
 - [GLOSSARY.md](./GLOSSARY.md): vocabulario canónico del dominio.
-- [AGENTS.md](./AGENTS.md): reglas de ciberseguridad y desarrollo.
-- `docs/adr/`: registros de decisiones de arquitectura.
+- [GEMINI.md](./GEMINI.md): directrices y modelos vigentes de Google AI Studio.
+- `docs/adr/`: registros de decisiones de arquitectura (`0001`–`0012`).
