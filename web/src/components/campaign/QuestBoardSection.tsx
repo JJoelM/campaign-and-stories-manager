@@ -110,7 +110,7 @@ export const QuestBoardSection: React.FC<QuestBoardSectionProps> = ({
 
   return (
     <section className="surface-card stack">
-      <div className="row-between">
+      <div className="row-between section-header-rule">
         <h2 className="section-title">Misiones y Rumores</h2>
         <div className="row">
           <button
@@ -231,7 +231,7 @@ export const QuestBoardSection: React.FC<QuestBoardSectionProps> = ({
             key={q.id}
             className={`quest-card${q.status === 'proposed_rumor' ? ' proposed' : ''}`}
           >
-            <div className="row-between">
+            <div className="row-between quest-header-row">
               <div className="row">
                 <span className="badge badge-asym">
                   {q.kind === 'main_quest'
@@ -240,7 +240,15 @@ export const QuestBoardSection: React.FC<QuestBoardSectionProps> = ({
                       ? 'Secundaria'
                       : 'Rumor'}
                 </span>
-                <strong style={{ color: 'var(--text-strong)' }}>{q.title}</strong>
+                <strong style={{ color: 'var(--text-strong)', fontFamily: 'var(--display-font)' }}>
+                  {q.title}
+                </strong>
+                {q.objectives.length > 0 && (
+                  <span className="badge" style={{ fontSize: '0.7rem' }}>
+                    {q.objectives.filter((o) => o.done).length}/
+                    {q.objectives.length} objetivos
+                  </span>
+                )}
               </div>
               <div className="menu-wrap">
                 <button

@@ -48,10 +48,26 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
   onRefresh,
   onShowToast,
 }) => {
-  const sheet = view.characterSheet;
+  const [pendingPatch, setPendingPatch] = useState<{
+    characterId: string;
+    fields: Partial<ThyreniaCharacterSheet>;
+  } | null>(null);
   const [lastRollText, setLastRollText] = useState<string>('');
+  const baseSheet = view.characterSheet;
+  const sheet: ThyreniaCharacterSheet =
+    pendingPatch && pendingPatch.characterId === baseSheet.characterId
+      ? { ...baseSheet, ...pendingPatch.fields }
+      : baseSheet;
 
   const patchSheet = async (patch: Partial<ThyreniaCharacterSheet>) => {
+    const targetId = baseSheet.characterId;
+    setPendingPatch((prev) => ({
+      characterId: targetId,
+      fields: {
+        ...(prev && prev.characterId === targetId ? prev.fields : {}),
+        ...patch,
+      },
+    }));
     try {
       await apiRequest(
         '/api/character/sheet',
@@ -59,7 +75,7 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            characterId: sheet.characterId,
+            characterId: targetId,
             ...patch,
           }),
         },
@@ -68,6 +84,10 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
       await onRefresh();
     } catch (err) {
       onShowToast(err instanceof Error ? err.message : 'Error guardando ficha');
+    } finally {
+      setPendingPatch((prev) =>
+        prev?.characterId === targetId ? null : prev,
+      );
     }
   };
 
@@ -89,9 +109,17 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
     .join('')
     .toUpperCase();
 
+  const initMod = abilityMod(sheet.abilities.dex);
+  const percSkill = sheet.skills.find((s) => s.key === 'percepcion');
+  const passivePerception =
+    10 +
+    abilityMod(sheet.abilities.wis) +
+    (percSkill?.proficient ? sheet.proficiencyBonus : 0) +
+    (percSkill?.rank || 0);
+
   return (
     <div className="stack-lg">
-      {/* Cabecera compacta de combate y vitalidad editable en 1 clic */}
+      {/* Cabecera compacta de combate, estadísticas pasivas y vitalidad editable */}
       <section className="panel sheet-hero-panel">
         <div className="sheet-identity-row">
           <div className="sheet-portrait-crest" aria-hidden="true">
@@ -100,8 +128,7 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
           <div className="sheet-identity-meta">
             <h1 className="sheet-char-name">{sheet.name}</h1>
             <p className="sheet-char-sub">
-              Nivel {sheet.level} · {capitalize(sheet.race)}{' '}
-              {capitalize(sheet.class)} · Comp. +{sheet.proficiencyBonus}
+              {capitalize(sheet.race)} · {capitalize(sheet.class)}
               {view.character.factions.length > 0
                 ? ` · ${view.character.factions.join(', ')}`
                 : ''}
@@ -112,6 +139,29 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
               <Shield size={11} style={{ verticalAlign: 'middle' }} /> CA
             </span>
             <strong>{sheet.armorClass}</strong>
+          </div>
+        </div>
+
+        <div className="passive-ribbon">
+          <div className="passive-stat">
+            <span className="muted" style={{ fontSize: '0.74rem' }}>Nivel</span>
+            <strong style={{ fontFamily: 'var(--display-font)' }}>{sheet.level}</strong>
+          </div>
+          <div className="passive-stat">
+            <span className="muted" style={{ fontSize: '0.74rem' }}>Iniciativa</span>
+            <strong style={{ fontFamily: 'var(--display-font)' }}>
+              {initMod >= 0 ? `+${initMod}` : initMod}
+            </strong>
+          </div>
+          <div className="passive-stat">
+            <span className="muted" style={{ fontSize: '0.74rem' }}>Perc. Pasiva</span>
+            <strong style={{ fontFamily: 'var(--display-font)' }}>{passivePerception}</strong>
+          </div>
+          <div className="passive-stat">
+            <span className="muted" style={{ fontSize: '0.74rem' }}>Competencia</span>
+            <strong style={{ fontFamily: 'var(--display-font)' }}>
+              +{sheet.proficiencyBonus}
+            </strong>
           </div>
         </div>
 
@@ -214,7 +264,7 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
           </div>
 
           {/* Fortuna */}
-          <div className="vital-card" style={{ justifyContent: 'center' }}>
+          <div className="vital-card" style={{ justifyContent: 'space-between' }}>
             <div className="row-between">
               <span className="vital-label">Fortuna</span>
               <div className="row" style={{ gap: 6 }}>
@@ -245,10 +295,27 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
                 </button>
               </div>
             </div>
+            <div className="seal-pips">
+              {Array.from({ length: Math.max(3, sheet.fortunePoints) }).map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={`seal-pip-btn${i < sheet.fortunePoints ? ' active' : ''}`}
+                  aria-label={`Fijar Fortuna en ${i + 1}`}
+                  onClick={() =>
+                    void patchSheet({
+                      fortunePoints: sheet.fortunePoints === i + 1 ? i : i + 1,
+                    })
+                  }
+                >
+                  {i < sheet.fortunePoints ? '◆' : '◇'}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Destino */}
-          <div className="vital-card" style={{ justifyContent: 'center' }}>
+          <div className="vital-card" style={{ justifyContent: 'space-between' }}>
             <div className="row-between">
               <span className="vital-label">
                 <Flame size={13} /> Destino
@@ -280,6 +347,23 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
                   +
                 </button>
               </div>
+            </div>
+            <div className="seal-pips">
+              {Array.from({ length: Math.max(3, sheet.destinyPoints) }).map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={`seal-pip-btn${i < sheet.destinyPoints ? ' active' : ''}`}
+                  aria-label={`Fijar Destino en ${i + 1}`}
+                  onClick={() =>
+                    void patchSheet({
+                      destinyPoints: sheet.destinyPoints === i + 1 ? i : i + 1,
+                    })
+                  }
+                >
+                  {i < sheet.destinyPoints ? '◆' : '◇'}
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -318,8 +402,8 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
       </section>
 
       {/* Habilidades en lista densa */}
-      <section className="panel stack" style={{ gap: 10 }}>
-        <div className="row-between">
+      <section className="panel stack" style={{ gap: 14 }}>
+        <div className="row-between section-header-rule">
           <h2 className="section-title">
             <Dices size={16} /> Habilidades
           </h2>
@@ -364,8 +448,8 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
 
       {/* Creencias y Defectos */}
       <div className="two-col">
-        <section className="panel stack" style={{ gap: 8 }}>
-          <h2 className="section-title">Creencias</h2>
+        <section className="panel stack" style={{ gap: 12 }}>
+          <h2 className="section-title section-header-rule">Creencias</h2>
           {sheet.beliefs.map((b, idx) => (
             <label key={idx} className="belief-card">
               <input
@@ -388,8 +472,10 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
           ))}
         </section>
 
-        <section className="panel stack" style={{ gap: 8 }}>
-          <h2 className="section-title">Defectos y Cicatrices</h2>
+        <section className="panel stack" style={{ gap: 12 }}>
+          <h2 className="section-title section-header-rule">
+            Defectos y Cicatrices
+          </h2>
           {sheet.flaws.map((f, idx) => (
             <div key={idx} className="flaw-card">
               {f}

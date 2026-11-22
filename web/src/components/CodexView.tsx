@@ -303,13 +303,31 @@ export const CodexView: React.FC<CodexViewProps> = ({
             style={{
               margin: 0,
               fontFamily: 'var(--display-font)',
-              fontSize: 'clamp(1.4rem, 3.2vw, 1.9rem)',
+              fontSize: 'clamp(1.45rem, 3.2vw, 1.95rem)',
               color: 'var(--text-strong)',
               lineHeight: 1.18,
             }}
           >
             {selectedNode.title}
           </h1>
+          <div className="ornamental-divider" style={{ marginTop: 10 }}>
+            ◆
+          </div>
+          {selectedNode.cardFields &&
+            Object.keys(selectedNode.cardFields).length > 0 && (
+              <div className="row" style={{ marginTop: 8, gap: 6 }}>
+                {Object.entries(selectedNode.cardFields)
+                  .slice(0, 6)
+                  .map(([k, v]) => (
+                    <span key={k} className="badge">
+                      <span className="muted" style={{ fontSize: '0.7rem' }}>
+                        {k}:
+                      </span>{' '}
+                      {v}
+                    </span>
+                  ))}
+              </div>
+            )}
         </div>
 
         {hasOwnImage && (

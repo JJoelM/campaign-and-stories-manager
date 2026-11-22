@@ -93,7 +93,7 @@ export const EntryGate: React.FC<EntryGateProps> = ({
 
         <div className="entry-grid">
           <section className="panel entry-card-panel">
-            <div className="row" style={{ gap: 8 }}>
+            <div className="row section-header-rule" style={{ gap: 8 }}>
               <Shield size={16} />
               <h2 className="section-title">Entrar como Jugador</h2>
             </div>
@@ -130,7 +130,7 @@ export const EntryGate: React.FC<EntryGateProps> = ({
           </section>
 
           <section className="panel entry-card-panel">
-            <div className="row" style={{ gap: 8 }}>
+            <div className="row section-header-rule" style={{ gap: 8 }}>
               <Crown size={16} />
               <h2 className="section-title">Director de Juego (GM)</h2>
             </div>

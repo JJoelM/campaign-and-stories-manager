@@ -53,7 +53,7 @@ export const PlotTimelineSection: React.FC<PlotTimelineSectionProps> = ({
 
   return (
     <section className="surface-card stack">
-      <div className="row-between">
+      <div className="row-between section-header-rule">
         <h2 className="section-title">Hilo de la Trama</h2>
         <div className="row">
           <button
@@ -84,37 +84,39 @@ export const PlotTimelineSection: React.FC<PlotTimelineSectionProps> = ({
         </div>
       </div>
 
-      <div className="timeline-strip" ref={stripRef}>
-        {tl.entries.map((entry, idx) => (
-          <button
-            key={entry.id}
-            type="button"
-            className={`timeline-chip${idx === selectedIdx ? ' active' : ''}`}
-            onClick={() => {
-              if (idx === selectedIdx && entry.kind !== 'upcoming') {
-                onOpenSession(entry);
-              } else {
-                setSelectedIdx(idx);
-              }
-            }}
-          >
-            <span
-              className={`badge ${
-                entry.kind === 'current'
-                  ? 'badge-gold'
-                  : entry.kind === 'upcoming'
-                    ? 'badge-prog'
-                    : ''
-              }`}
+      <div className="timeline-track-wrap">
+        <div className="timeline-strip" ref={stripRef}>
+          {tl.entries.map((entry, idx) => (
+            <button
+              key={entry.id}
+              type="button"
+              className={`timeline-chip${idx === selectedIdx ? ' active' : ''}`}
+              onClick={() => {
+                if (idx === selectedIdx && entry.kind !== 'upcoming') {
+                  onOpenSession(entry);
+                } else {
+                  setSelectedIdx(idx);
+                }
+              }}
             >
-              {entry.sessionTag}
-            </span>
-            <span className="timeline-chip-title">{entry.title}</span>
-            <span className="muted" style={{ fontSize: '0.72rem' }}>
-              {entry.thyreniaDate.dayOfMonth} de {entry.thyreniaDate.monthName}
-            </span>
-          </button>
-        ))}
+              <span
+                className={`badge ${
+                  entry.kind === 'current'
+                    ? 'badge-gold'
+                    : entry.kind === 'upcoming'
+                      ? 'badge-prog'
+                      : ''
+                }`}
+              >
+                {entry.sessionTag}
+              </span>
+              <span className="timeline-chip-title">{entry.title}</span>
+              <span className="muted" style={{ fontSize: '0.72rem' }}>
+                {entry.thyreniaDate.dayOfMonth} de {entry.thyreniaDate.monthName}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {activeEntry && (
@@ -141,27 +143,44 @@ export const PlotTimelineSection: React.FC<PlotTimelineSectionProps> = ({
             )}
           </div>
 
-          <strong
-            style={{
-              fontFamily: 'var(--display-font)',
-              fontSize: '1.02rem',
-              color: 'var(--text-strong)',
-            }}
-          >
-            {activeEntry.title}
-          </strong>
+          <div className="timeline-focus-grid">
+            <div className="stack" style={{ gap: 8 }}>
+              <strong
+                style={{
+                  fontFamily: 'var(--display-font)',
+                  fontSize: '1.08rem',
+                  color: 'var(--text-strong)',
+                  letterSpacing: '0.03em',
+                }}
+              >
+                {activeEntry.title}
+              </strong>
+              <p className="muted" style={{ margin: 0, lineHeight: 1.6 }}>
+                {activeEntry.summary}
+              </p>
+            </div>
 
-          <p className="muted" style={{ margin: 0 }}>
-            {activeEntry.summary}
-          </p>
-
-          {activeEntry.highlights.length > 0 && (
-            <ul style={{ margin: 0, paddingLeft: 18, fontSize: '0.84rem' }}>
-              {activeEntry.highlights.slice(0, 3).map((h, i) => (
-                <li key={i}>{h}</li>
-              ))}
-            </ul>
-          )}
+            {activeEntry.highlights.length > 0 && (
+              <div className="card-inner stack" style={{ gap: 8 }}>
+                <span className="overline">Hitos de la Sesión</span>
+                <ul
+                  style={{
+                    margin: 0,
+                    paddingLeft: 16,
+                    fontSize: '0.83rem',
+                    lineHeight: 1.5,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 5,
+                  }}
+                >
+                  {activeEntry.highlights.slice(0, 3).map((h, i) => (
+                    <li key={i}>{h}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

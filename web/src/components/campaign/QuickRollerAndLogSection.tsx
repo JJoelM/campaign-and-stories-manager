@@ -48,18 +48,50 @@ export const QuickRollerAndLogSection: React.FC<QuickRollerAndLogSectionProps> =
     await onRefresh();
   };
 
+  const latestRoll = liveRolls[0];
+
   return (
     <section className="surface-card stack">
-      <div className="row-between">
+      <div className="row-between section-header-rule">
         <h2 className="section-title">
           <Dices size={16} /> Tirador 1d20 y Bitácora
         </h2>
-        <span className="muted" style={{ fontSize: '0.8rem' }}>
-          {sheet.name}
-        </span>
+        <span className="overline">{sheet.name}</span>
       </div>
 
-      <div className="row">
+      {/* Vitrina D20 en vivo */}
+      <div className="d20-showcase">
+        <div className="d20-crest" aria-hidden="true">
+          {latestRoll ? (
+            latestRoll.d20
+          ) : (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <polygon points="12 2 21 7 21 17 12 22 3 17 3 7" />
+              <polyline points="12 2 12 22" />
+              <polyline points="3 7 12 13 21 7" />
+            </svg>
+          )}
+        </div>
+        {latestRoll ? (
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 700, color: 'var(--text-strong)', fontSize: '0.9rem' }}>
+              {latestRoll.skillLabel} = {latestRoll.total}
+            </div>
+            <div className="muted" style={{ fontSize: '0.76rem' }}>
+              1d20 ({latestRoll.d20}){' '}
+              {latestRoll.bonus >= 0 ? `+ ${latestRoll.bonus}` : latestRoll.bonus} ·{' '}
+              {latestRoll.timeLabel}
+            </div>
+          </div>
+        ) : (
+          <div className="muted" style={{ flex: 1, fontSize: '0.82rem' }}>
+            Selecciona una habilidad para lanzar 1d20 en mesa.
+          </div>
+        )}
+      </div>
+
+      {/* Tabla alineada de 2 columnas para habilidades rápidas */}
+      <div className="quick-skill-grid">
         {sheet.skills.map((sk) => {
           const mod = abilityMod(sheet.abilities[sk.defaultAbility]);
           const prof = sk.proficient ? sheet.proficiencyBonus : 0;
@@ -69,15 +101,19 @@ export const QuickRollerAndLogSection: React.FC<QuickRollerAndLogSectionProps> =
             <button
               key={sk.key}
               type="button"
-              style={{
-                padding: '5px 9px',
-                fontSize: '0.78rem',
-                borderColor: sk.proficient ? 'var(--accent)' : undefined,
-              }}
+              className={`quick-skill-btn${sk.proficient ? ' proficient' : ''}`}
               onClick={() => onRecordRoll(sk.label, total)}
             >
-              <span>{sk.label}</span>
-              <strong style={{ color: 'var(--accent)' }}>
+              <span className="row" style={{ gap: 6, flexWrap: 'nowrap', minWidth: 0 }}>
+                <span
+                  className={`skill-dot${sk.proficient ? ' filled' : ''}`}
+                  aria-hidden="true"
+                />
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {sk.label}
+                </span>
+              </span>
+              <strong style={{ color: 'var(--accent)', fontFamily: 'var(--display-font)' }}>
                 {total >= 0 ? `+${total}` : total}
               </strong>
             </button>

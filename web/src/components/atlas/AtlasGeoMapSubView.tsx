@@ -362,8 +362,18 @@ export const AtlasGeoMapSubView: React.FC<AtlasGeoMapSubViewProps> = ({
         </div>
       )}
 
-      {/* Marco del mapa con inspector anclado */}
+      {/* Marco del mapa con cartela cartográfica e inspector anclado */}
       <div className="map-frame">
+        <div className="map-cartouche">
+          <div className="map-cartouche-title">{currentMap.name}</div>
+          <div className="map-cartouche-sub">
+            {currentMap.scale === 'world'
+              ? 'Planisferio Global'
+              : currentMap.scale === 'continent'
+                ? 'Mapa Continental'
+                : 'Plano Urbano'}
+          </div>
+        </div>
         <div
           className="map-canvas-inner"
           style={{ transform: `scale(${zoom})` }}
