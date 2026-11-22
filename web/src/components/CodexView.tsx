@@ -371,63 +371,76 @@ export const CodexView: React.FC<CodexViewProps> = ({
     );
   }
 
-  // === MODO EXPLORADOR COMPACTO ===
+  // === MODO EXPLORADOR POR TOMO ===
   return (
-    <div className="stack">
-      <div className="row-between">
-        <div>
-          <h1 className="section-title" style={{ fontSize: '1.25rem' }}>
-            Códice de Thyrenia
-          </h1>
-          <div className="muted">
-            {deduplicatedNodes.length} entradas visibles para {view.character.name}
+    <div className="stack-lg">
+      <section className="panel stack">
+        <div className="row-between section-header-rule">
+          <div>
+            <h1 className="section-title" style={{ fontSize: '1.3rem' }}>
+              Códice de Thyrenia
+            </h1>
+            <div className="muted" style={{ marginTop: 4 }}>
+              {deduplicatedNodes.length} entradas visibles para{' '}
+              {view.character.name}
+            </div>
           </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            const pool = filteredNodes.length > 0 ? filteredNodes : deduplicatedNodes;
-            const pick = pool[Math.floor(Math.random() * pool.length)];
-            if (pick) onSelectNode(pick.id);
-          }}
-        >
-          <Shuffle size={14} /> Al azar
-        </button>
-      </div>
-
-      <div className="codex-filter-bar">
-        <div className="codex-pill-strip" role="tablist" aria-label="Categorías del Códice">
-          {CATEGORIES.map((c) => (
-            <button
-              key={c.category}
-              type="button"
-              role="tab"
-              aria-selected={activeCategory === c.category}
-              className={`codex-pill${activeCategory === c.category ? ' active' : ''}`}
-              onClick={() => setActiveCategory(c.category)}
-            >
-              {c.label}
-            </button>
-          ))}
+          <button
+            type="button"
+            onClick={() => {
+              const pool =
+                filteredNodes.length > 0 ? filteredNodes : deduplicatedNodes;
+              const pick = pool[Math.floor(Math.random() * pool.length)];
+              if (pick) onSelectNode(pick.id);
+            }}
+          >
+            <Shuffle size={14} /> Al azar
+          </button>
         </div>
 
-        <div className="row" style={{ flex: '0 1 250px', width: '100%' }}>
-          <div style={{ position: 'relative', width: '100%' }}>
-            <Search
-              size={14}
-              className="muted"
-              style={{ position: 'absolute', left: 10, top: 10, pointerEvents: 'none' }}
-            />
-            <input
-              type="search"
-              placeholder="Filtrar códice..."
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
-              style={{ width: '100%', paddingLeft: 30 }}
-            />
+        <div className="codex-filter-bar">
+          <div
+            className="codex-pill-strip"
+            role="tablist"
+            aria-label="Categorías del Códice"
+          >
+            {CATEGORIES.map((c) => (
+              <button
+                key={c.category}
+                type="button"
+                role="tab"
+                aria-selected={activeCategory === c.category}
+                className={`codex-pill${activeCategory === c.category ? ' active' : ''}`}
+                onClick={() => setActiveCategory(c.category)}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="row" style={{ flex: '0 1 250px', width: '100%' }}>
+            <div style={{ position: 'relative', width: '100%' }}>
+              <Search
+                size={14}
+                className="muted"
+                style={{
+                  position: 'absolute',
+                  left: 10,
+                  top: 10,
+                  pointerEvents: 'none',
+                }}
+              />
+              <input
+                type="search"
+                placeholder="Filtrar códice..."
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+                style={{ width: '100%', paddingLeft: 30 }}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {filteredNodes.length === 0 ? (
         <div className="surface-card muted">
@@ -443,8 +456,17 @@ export const CodexView: React.FC<CodexViewProps> = ({
               className="lore-card-btn"
               onClick={() => onSelectNode(n.id)}
             >
+              <span className="overline" style={{ fontSize: '0.66rem' }}>
+                {CARD_TYPE_LABELS[n.cardType || 'rule_lore']}
+              </span>
               <div className="row-between" style={{ width: '100%' }}>
-                <strong style={{ color: 'var(--text-strong)', fontSize: '0.9rem' }}>
+                <strong
+                  style={{
+                    fontFamily: 'var(--display-font)',
+                    color: 'var(--text-strong)',
+                    fontSize: '0.92rem',
+                  }}
+                >
                   {n.title}
                 </strong>
                 {n.isSkeleton && (
@@ -454,7 +476,10 @@ export const CodexView: React.FC<CodexViewProps> = ({
                 )}
               </div>
               {!n.isSkeleton && (
-                <span className="muted" style={{ fontSize: '0.79rem', lineHeight: 1.4 }}>
+                <span
+                  className="muted"
+                  style={{ fontSize: '0.8rem', lineHeight: 1.45 }}
+                >
                   {extractCleanExcerpt(n.sanitizedContent, 92)}
                 </span>
               )}

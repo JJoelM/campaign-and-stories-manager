@@ -285,9 +285,12 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
         </div>
       </section>
 
-      {/* Atributos */}
-      <section className="stack" style={{ gap: 8 }}>
-        <div className="overline">Atributos (1d20)</div>
+      {/* Atributos en Panel de Grimorio D&D */}
+      <section className="panel stack" style={{ gap: 16 }}>
+        <div className="row-between section-header-rule">
+          <h2 className="section-title">Atributos de Personaje</h2>
+          <span className="overline">Modificadores 1d20</span>
+        </div>
         <div className="stat-grid">
           {ABILITY_META.map((ab) => {
             const score = sheet.abilities[ab.key];

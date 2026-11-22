@@ -59,15 +59,25 @@ export const CampaignView: React.FC<CampaignViewProps> = ({
 
   return (
     <div className="stack-lg">
-      {/* 1. Cabecera Unificada: Campaña + Escena en Curso (sin duplicados) */}
+      {/* 1. Crónica en Curso (Cabecera WoW / Octopath / D&D) */}
       <section className="hero-split">
-        <div className="stack" style={{ gap: 8 }}>
+        <div className="stack" style={{ gap: 12 }}>
+          <div className="row-between section-header-rule">
+            <span className="overline">{view.activeCampaign.name}</span>
+            <span className="muted" style={{ fontSize: '0.8rem' }}>
+              {view.calendarDate.formatted}
+            </span>
+          </div>
+
+          <h1 className="hero-heading">
+            {humanizeSceneTitle(view.sceneState.id, currentLocation)}
+          </h1>
+
           <div className="row" style={{ gap: 6 }}>
             <span className="badge">
               {view.character.name} · {capitalize(view.character.race)}{' '}
               {capitalize(view.character.class)}
             </span>
-            <span className="badge">{view.calendarDate.formatted}</span>
             <button
               type="button"
               className="badge badge-prog"
@@ -83,23 +93,11 @@ export const CampaignView: React.FC<CampaignViewProps> = ({
             )}
           </div>
 
-          <div className="overline">{view.activeCampaign.name}</div>
-          <h1 className="hero-heading">
-            {humanizeSceneTitle(view.sceneState.id, currentLocation)}
-          </h1>
+          <div className="ornamental-divider">◆</div>
 
-          <p
-            style={{
-              margin: 0,
-              fontFamily: 'var(--reader-font)',
-              fontSize: '1.05rem',
-              lineHeight: 1.6,
-            }}
-          >
-            {view.sceneState.description}
-          </p>
+          <p className="scene-prose">{view.sceneState.description}</p>
 
-          <div className="row" style={{ marginTop: 2 }}>
+          <div className="row" style={{ marginTop: 4 }}>
             <button type="button" className="btn-primary" onClick={onOpenAtlasGeo}>
               <Compass size={15} /> Ver en Mapa
             </button>
