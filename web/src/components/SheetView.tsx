@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Download, MoreHorizontal, PenLine, Shield } from 'lucide-react';
-import type { ApiViewPayload } from '../types';
+import type { ApiViewPayload, ThyreniaCharacterSheet } from '../types';
 import { downloadAuthenticatedFile } from '../lib/api';
 import { usePopoverDismiss } from '../lib/usePopoverDismiss';
 import { CharacterVttSheetTab } from './sheet/CharacterVttSheetTab';
@@ -17,6 +17,7 @@ interface SheetViewProps {
   prefill: StoryPrefill | null;
   onClearPrefill: () => void;
   onRecordRoll: (skillLabel: string, bonus: number) => void;
+  onSheetUpdated: (sheet: ThyreniaCharacterSheet) => void;
   onRefresh: () => Promise<void>;
   onShowToast: (msg: string) => void;
 }
@@ -27,6 +28,7 @@ export const SheetView: React.FC<SheetViewProps> = ({
   prefill,
   onClearPrefill,
   onRecordRoll,
+  onSheetUpdated,
   onRefresh,
   onShowToast,
 }) => {
@@ -109,7 +111,7 @@ export const SheetView: React.FC<SheetViewProps> = ({
             view={view}
             gmKey={gmKey}
             onRecordRoll={onRecordRoll}
-            onRefresh={onRefresh}
+            onSheetUpdated={onSheetUpdated}
             onShowToast={onShowToast}
           />
         ) : (

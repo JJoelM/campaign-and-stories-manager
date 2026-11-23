@@ -487,6 +487,11 @@ export const App: React.FC = () => {
               prefill={storyPrefill}
               onClearPrefill={() => setStoryPrefill(null)}
               onRecordRoll={handleRecordRoll}
+              onSheetUpdated={(updatedSheet) =>
+                setView((prev) =>
+                  prev ? { ...prev, characterSheet: updatedSheet } : prev,
+                )
+              }
               onRefresh={() => fetchView()}
               onShowToast={showToast}
             />

@@ -34,7 +34,7 @@ interface CharacterVttSheetTabProps {
   view: ApiViewPayload;
   gmKey: string;
   onRecordRoll: (skillLabel: string, bonus: number) => void;
-  onRefresh: () => Promise<void>;
+  onSheetUpdated: (sheet: ThyreniaCharacterSheet) => void;
   onShowToast: (msg: string) => void;
 }
 
@@ -52,7 +52,7 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
   view,
   gmKey,
   onRecordRoll,
-  onRefresh,
+  onSheetUpdated,
   onShowToast,
 }) => {
   const [sheetPage, setSheetPage] = useState<SheetPage>('main');
@@ -93,7 +93,7 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
     payload: Partial<ThyreniaCharacterSheet>,
   ) => {
     try {
-      await apiRequest(
+      const data = await apiRequest<{ characterSheet: ThyreniaCharacterSheet }>(
         '/api/character/sheet',
         {
           method: 'POST',
@@ -105,7 +105,7 @@ export const CharacterVttSheetTab: React.FC<CharacterVttSheetTabProps> = ({
         },
         gmKey,
       );
-      await onRefresh();
+      onSheetUpdated(data.characterSheet);
     } catch (err) {
       onShowToast(err instanceof Error ? err.message : 'Error guardando ficha');
     } finally {
