@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Dices } from 'lucide-react';
 import type { ApiViewPayload, LiveRollEntry } from '../../types';
 import { apiRequest } from '../../lib/api';
+import { computeSkillBreakdown } from '../../lib/sheet-utils';
 
 interface QuickRollerAndLogSectionProps {
   view: ApiViewPayload;
@@ -10,10 +11,6 @@ interface QuickRollerAndLogSectionProps {
   liveRolls: LiveRollEntry[];
   onRecordRoll: (skillLabel: string, bonus: number) => void;
   onRefresh: () => Promise<void>;
-}
-
-function abilityMod(score: number): number {
-  return Math.floor((Number(score || 10) - 10) / 2);
 }
 
 export const QuickRollerAndLogSection: React.FC<QuickRollerAndLogSectionProps> = ({
@@ -124,10 +121,7 @@ export const QuickRollerAndLogSection: React.FC<QuickRollerAndLogSectionProps> =
       {/* Tabla alineada de 2 columnas para habilidades rápidas */}
       <div className="quick-skill-grid">
         {sheet.skills.map((sk) => {
-          const mod = abilityMod(sheet.abilities[sk.defaultAbility]);
-          const prof = sk.proficient ? sheet.proficiencyBonus : 0;
-          const clsBonus = sk.isClassSkill && sk.rank >= 1 ? 2 : 0;
-          const total = mod + prof + sk.rank + clsBonus;
+          const { total } = computeSkillBreakdown(sheet, sk);
           return (
             <button
               key={sk.key}

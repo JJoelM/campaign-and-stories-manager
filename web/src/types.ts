@@ -201,13 +201,38 @@ export interface ManualSessionLogEntry {
   createdAt: string;
 }
 
+export type AbilityKey = 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+
 export interface ThyreniaSkillEntry {
   key: string;
   label: string;
-  defaultAbility: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha';
+  defaultAbility: AbilityKey;
   proficient: boolean;
   isClassSkill: boolean;
   rank: number;
+}
+
+export interface ThyreniaAttackEntry {
+  name: string;
+  attackBonus: string;
+  damage: string;
+  damageType: string;
+}
+
+export interface ThyreniaSpellEntry {
+  name: string;
+  prepared: boolean;
+  castTime: string;
+  damageOrEffect: string;
+  ritual: boolean;
+  concentration: boolean;
+}
+
+export interface ThyreniaSpellLevel {
+  level: number;
+  slotsTotal: number;
+  slotsUsed: number;
+  spells: ThyreniaSpellEntry[];
 }
 
 export interface ThyreniaCharacterSheet {
@@ -216,23 +241,61 @@ export interface ThyreniaCharacterSheet {
   race: string;
   class: string;
   level: number;
+  background: string;
+  alignment: string;
+  playerName: string;
+  experiencePoints: number;
   proficiencyBonus: number;
-  hp: { current: number; max: number };
+  inspiration: boolean;
+  speed: string;
+  hp: { current: number; max: number; temp: number };
+  hitDice: { total: string; used: number };
+  deathSaves: { successes: number; failures: number };
   armorClass: number;
   mana: { current: number; max: number };
-  abilities: {
-    str: number;
-    dex: number;
-    con: number;
-    int: number;
-    wis: number;
-    cha: number;
-  };
+  auraPoints: { current: number; max: number };
+  abilities: Record<AbilityKey, number>;
+  savingThrowProficiencies: Record<AbilityKey, boolean>;
   fortunePoints: number;
   destinyPoints: number;
+  desperateActionUsed: boolean;
   beliefs: Array<{ text: string; markedThisSession: boolean; resolved: boolean }>;
   flaws: string[];
+  personalityTraits: string;
+  ideals: string;
+  bonds: string;
   skills: ThyreniaSkillEntry[];
+  proficiencies: {
+    armors: { light: boolean; medium: boolean; heavy: boolean; shield: boolean };
+    weapons: { simple: boolean; martial: boolean; other: string };
+    tools: string;
+    languages: string;
+  };
+  attacks: ThyreniaAttackEntry[];
+  featuresAndTraits: string;
+  equipment: string;
+  inventory: string;
+  coins: { pc: number; pp: number; pe: number; po: number; ppt: number };
+  appearance: {
+    age: string;
+    height: string;
+    weight: string;
+    eyes: string;
+    skin: string;
+    hair: string;
+    portraitImage: string;
+    symbolName: string;
+    symbolDescription: string;
+  };
+  milonga: string;
+  alliesAndOrganizations: string;
+  additionalFeatures: string;
+  treasure: string;
+  spellcasting: {
+    castingClass: string;
+    castingAbility: 'int' | 'wis' | 'cha';
+    levels: ThyreniaSpellLevel[];
+  };
 }
 
 export interface SceneState {

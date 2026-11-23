@@ -236,13 +236,30 @@ export function buildDefaultSheetForCharacter(
       race: character.race,
       class: character.class,
       level: 5,
+      background: 'Acólita de Lamú / Inmortal',
+      alignment: 'Neutral Bueno',
+      experiencePoints: 6500,
       proficiencyBonus: 3,
-      hp: { current: 34, max: 34 },
+      speed: '30 pies',
+      hp: { current: 34, max: 34, temp: 0 },
+      hitDice: { total: '5d6', used: 0 },
       armorClass: 14,
       mana: { current: 18, max: 20 },
+      auraPoints: { current: 5, max: 5 },
       abilities: { str: 10, dex: 14, con: 14, int: 13, wis: 12, cha: 18 },
+      savingThrowProficiencies: {
+        str: false,
+        dex: false,
+        con: true,
+        int: false,
+        wis: false,
+        cha: true,
+      },
       fortunePoints: 2,
       destinyPoints: 1,
+      personalityTraits: 'Serena y protectora; observa el fluir del maná antes de hablar.',
+      ideals: 'Los fuertes deben amparar a los inocentes y sanar las cicatrices de Thyrenia.',
+      bonds: 'Kaelion y sus antiguos compañeros de la Torre de los Espejismos.',
       beliefs: [
         {
           text: 'Los fuertes deben proteger a los inocentes y sanar las heridas del mundo.',
@@ -261,6 +278,74 @@ export function buildDefaultSheetForCharacter(
         ['arcana', 'influencia'],
         { arcana: 2, percepcion: 1 },
       ),
+      proficiencies: {
+        armors: { light: false, medium: false, heavy: false, shield: false },
+        weapons: { simple: true, martial: false, other: 'Bastones y dagas' },
+        tools: 'Kit de herboristería',
+        languages: 'Común, Élfico, Celestial',
+      },
+      attacks: [
+        {
+          name: 'Descarga de Tormenta',
+          attackBonus: '+7',
+          damage: '2d10',
+          damageType: 'Relámpago',
+        },
+        {
+          name: 'Daga rúnica',
+          attackBonus: '+5',
+          damage: '1d4 + 2',
+          damageType: 'Perforante',
+        },
+      ],
+      featuresAndTraits:
+        'Origen de Tormenta · Fuente de Maná (5 puntos de hechicería) · Inmortalidad sellada.',
+      equipment: 'Túnica de acólita de Mineralia, foco arcano de cristal, daga rúnica.',
+      coins: { pc: 12, pp: 35, pe: 0, po: 48, ppt: 2 },
+      appearance: {
+        age: 'Inmortal (aparenta 26)',
+        height: '1.72 m',
+        weight: '60 kg',
+        eyes: 'Ámbar tormenta',
+        skin: 'Pálida dorada',
+        hair: 'Plateado',
+        symbolName: 'Sello de Lamú',
+      },
+      milonga:
+        'Nacida en Mineralia bajo la guía de un curandero y una guerrera. Sobrevivió a la traición de Azura en la Torre de los Espejismos hace 500 años, perdiendo parte de sus recuerdos hasta reencontrarse con Kaelion en Fuegosanto.',
+      alliesAndOrganizations: 'Orden del Relámpago Sereno · Kaelion · Larissa · Kriv',
+      spellcasting: {
+        castingClass: 'Hechicero',
+        castingAbility: 'cha',
+        levels: [
+          {
+            level: 0,
+            slotsTotal: 0,
+            slotsUsed: 0,
+            spells: [
+              { name: 'Descarga de Fuego', prepared: true, castTime: '1 acción', damageOrEffect: '2d10 Fuego', ritual: false, concentration: false },
+              { name: 'Luz', prepared: true, castTime: '1 acción', damageOrEffect: 'Iluminación 20/40 pies', ritual: false, concentration: false },
+            ],
+          },
+          {
+            level: 1,
+            slotsTotal: 4,
+            slotsUsed: 1,
+            spells: [
+              { name: 'Escudo', prepared: true, castTime: '1 reacción', damageOrEffect: '+5 CA', ritual: false, concentration: false },
+              { name: 'Proyectil Mágico', prepared: true, castTime: '1 acción', damageOrEffect: '3×(1d4+1) Fuerza', ritual: false, concentration: false },
+            ],
+          },
+          {
+            level: 2,
+            slotsTotal: 3,
+            slotsUsed: 0,
+            spells: [
+              { name: 'Paso Brumoso', prepared: true, castTime: '1 acción adicional', damageOrEffect: 'Teletransporte 30 pies', ritual: false, concentration: false },
+            ],
+          },
+        ],
+      },
     });
   }
 
@@ -271,11 +356,25 @@ export function buildDefaultSheetForCharacter(
       race: character.race,
       class: character.class,
       level: 4,
+      background: 'Oráculo de Selene',
+      alignment: 'Legal Bueno',
+      experiencePoints: 2700,
       proficiencyBonus: 2,
-      hp: { current: 31, max: 31 },
+      speed: '30 pies',
+      hp: { current: 31, max: 31, temp: 0 },
+      hitDice: { total: '4d8', used: 0 },
       armorClass: 16,
       mana: { current: 14, max: 16 },
+      auraPoints: { current: 4, max: 4 },
       abilities: { str: 10, dex: 12, con: 14, int: 12, wis: 17, cha: 14 },
+      savingThrowProficiencies: {
+        str: false,
+        dex: false,
+        con: false,
+        int: false,
+        wis: true,
+        cha: true,
+      },
       fortunePoints: 2,
       destinyPoints: 1,
       beliefs: [
@@ -291,6 +390,36 @@ export function buildDefaultSheetForCharacter(
         ['arcana', 'sociedad'],
         { sociedad: 1, percepcion: 1 },
       ),
+      proficiencies: {
+        armors: { light: true, medium: true, heavy: false, shield: true },
+        weapons: { simple: true, martial: false, other: '' },
+        tools: 'Set de caligrafía astral',
+        languages: 'Común, Celestial',
+      },
+      attacks: [
+        {
+          name: 'Llama Sagrada',
+          attackBonus: 'CD 13',
+          damage: '1d8',
+          damageType: 'Radiante',
+        },
+      ],
+      coins: { pc: 8, pp: 20, pe: 0, po: 32, ppt: 0 },
+      spellcasting: {
+        castingClass: 'Clérigo',
+        castingAbility: 'wis',
+        levels: [
+          {
+            level: 1,
+            slotsTotal: 4,
+            slotsUsed: 1,
+            spells: [
+              { name: 'Bendición', prepared: true, castTime: '1 acción', damageOrEffect: '+1d4 ataque/salvación', ritual: false, concentration: true },
+              { name: 'Palabra de Curación', prepared: true, castTime: '1 acción adicional', damageOrEffect: '1d4 + 3 curación', ritual: false, concentration: false },
+            ],
+          },
+        ],
+      },
     });
   }
 
@@ -301,10 +430,21 @@ export function buildDefaultSheetForCharacter(
     class: character.class,
     level: 3,
     proficiencyBonus: 2,
-    hp: { current: 28, max: 28 },
+    speed: '30 pies',
+    hp: { current: 28, max: 28, temp: 0 },
+    hitDice: { total: '3d10', used: 0 },
     armorClass: 15,
     mana: { current: 8, max: 8 },
+    auraPoints: { current: 2, max: 2 },
     abilities: { str: 15, dex: 14, con: 14, int: 11, wis: 13, cha: 12 },
+    savingThrowProficiencies: {
+      str: true,
+      dex: false,
+      con: true,
+      int: false,
+      wis: false,
+      cha: false,
+    },
     fortunePoints: 1,
     destinyPoints: 1,
     beliefs: [
@@ -320,6 +460,21 @@ export function buildDefaultSheetForCharacter(
       ['atletismo', 'sociedad'],
       { atletismo: 1 },
     ),
+    proficiencies: {
+      armors: { light: true, medium: true, heavy: false, shield: true },
+      weapons: { simple: true, martial: true, other: '' },
+      tools: '',
+      languages: 'Común',
+    },
+    attacks: [
+      {
+        name: 'Espada larga',
+        attackBonus: '+4',
+        damage: '1d8 + 2',
+        damageType: 'Cortante',
+      },
+    ],
+    coins: { pc: 5, pp: 14, pe: 0, po: 18, ppt: 0 },
   });
 }
 
@@ -340,6 +495,7 @@ export function buildFoundryVttActorJson(
   const abilityMap = (ability: 'str' | 'dex' | 'con' | 'int' | 'wis' | 'cha') => ({
     value: sheet.abilities[ability],
     mod: mod(sheet.abilities[ability]),
+    proficient: sheet.savingThrowProficiencies?.[ability] ? 1 : 0,
   });
 
   const skillBonusTotal = (s: ThyreniaSkillEntry): number => {
@@ -350,6 +506,7 @@ export function buildFoundryVttActorJson(
   };
 
   const bioRows = [
+    sheet.milonga ? `<p><strong>Milonga:</strong> ${sheet.milonga}</p>` : '',
     `<p><strong>Creencias:</strong></p><ul>${sheet.beliefs.map((b) => `<li>${b.text}</li>`).join('')}</ul>`,
     `<p><strong>Defectos:</strong></p><ul>${sheet.flaws.map((f) => `<li>${f}</li>`).join('')}</ul>`,
     `<p><strong>Habilidades de Thyrenia:</strong></p><ul>${sheet.skills
@@ -358,7 +515,9 @@ export function buildFoundryVttActorJson(
           `<li>${s.label} (Rango ${s.rank}${s.isClassSkill ? ', Clase' : ''}): +${skillBonusTotal(s)}</li>`,
       )
       .join('')}</ul>`,
-  ].join('');
+  ]
+    .filter(Boolean)
+    .join('');
 
   return {
     name: sheet.name,
@@ -376,18 +535,31 @@ export function buildFoundryVttActorJson(
         hp: {
           value: sheet.hp.current,
           max: sheet.hp.max,
-          temp: 0,
+          temp: sheet.hp.temp ?? 0,
         },
         ac: {
           flat: sheet.armorClass,
           calc: 'flat',
         },
         prof: sheet.proficiencyBonus,
+        movement: { walk: Number.parseInt(sheet.speed, 10) || 30 },
+        inspiration: sheet.inspiration,
+        death: sheet.deathSaves,
+      },
+      currency: {
+        cp: sheet.coins?.pc ?? 0,
+        sp: sheet.coins?.pp ?? 0,
+        ep: sheet.coins?.pe ?? 0,
+        gp: sheet.coins?.po ?? 0,
+        pp: sheet.coins?.ppt ?? 0,
       },
       details: {
         race: sheet.race,
         class: sheet.class,
         level: sheet.level,
+        background: sheet.background,
+        alignment: sheet.alignment,
+        xp: { value: sheet.experiencePoints ?? 0 },
         biography: {
           value: bioRows,
         },
